@@ -20,7 +20,7 @@ CoCreate turns natural language into fully functional React web apps. Generate a
 
 - **Backend**: FastAPI + aiosqlite (Python)
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS
-- **LLM**: Google Gemini 2.0 Flash
+- **LLM**: Mistral Codestral
 - **Generated apps**: React + Tailwind CSS, built with Vite, served as PWAs
 
 ## Project structure
@@ -82,8 +82,8 @@ Open [http://localhost:5173](http://localhost:5173).
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `GEMINI_API_KEY` | Yes | — | Your Google Gemini API key |
-| `GEMINI_MODEL` | No | `gemini-2.0-flash` | Model to use |
+| `MISTRAL_API_KEY` | Yes | — | Your Mistral API key |
+| `MISTRAL_MODEL` | No | `codestral-latest` | Model to use |
 | `MAX_BUILD_RETRIES` | No | `3` | Build retry attempts |
 | `APPS_DIR` | No | `./generated_apps` | Where built apps are stored |
 

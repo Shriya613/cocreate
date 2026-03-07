@@ -35,7 +35,11 @@ async def generate_app(req: GenerateRequest, db: aiosqlite.Connection = Depends(
     app_id = app["id"]
 
     # 2. Generate code via LLM
-    code = await llm_client.generate_app_code(description)
+    try:
+        code = await llm_client.generate_app_code(description)
+    except Exception as e:
+        await app_service.delete_app(db, app_id)
+        raise HTTPException(status_code=502, detail=f"AI generation failed: {str(e)}")
 
     # 3. Build the app
     success, result = await build_app(app_id, "", code)

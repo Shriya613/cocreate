@@ -1,8 +1,7 @@
-from google import genai
-from google.genai import types as genai_types
-from app.config import GEMINI_API_KEY, GEMINI_MODEL
+from mistralai import Mistral
+from app.config import MISTRAL_API_KEY, MISTRAL_MODEL
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = Mistral(api_key=MISTRAL_API_KEY)
 
 SYSTEM_PROMPT = """You are an expert React developer. Your job is to generate complete, working React applications.
 
@@ -37,56 +36,55 @@ RULES:
 
 
 async def generate_app_code(description: str) -> str:
-    response = await client.aio.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=f"Build me this app: {description}",
-        config=genai_types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            temperature=0.7,
-            max_output_tokens=8192,
-        ),
+    response = await client.chat.complete_async(
+        model=MISTRAL_MODEL,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"Build me this app: {description}"},
+        ],
+        temperature=0.7,
+        max_tokens=8000,
     )
-    return _clean_code(response.text or "")
+    return _clean_code(response.choices[0].message.content or "")
 
 
 async def iterate_app_code(current_code: str, instruction: str, history: list[dict]) -> str:
-    prompt = (
-        f"Here is the current App.tsx:\n\n{current_code}\n\n"
-        f"Now apply this change: {instruction}"
+    response = await client.chat.complete_async(
+        model=MISTRAL_MODEL,
+        messages=[
+            {"role": "system", "content": ITERATE_SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": f"Here is the current App.tsx:\n\n{current_code}\n\nNow apply this change: {instruction}",
+            },
+        ],
+        temperature=0.7,
+        max_tokens=8000,
     )
-    response = await client.aio.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt,
-        config=genai_types.GenerateContentConfig(
-            system_instruction=ITERATE_SYSTEM_PROMPT,
-            temperature=0.7,
-            max_output_tokens=8192,
-        ),
-    )
-    return _clean_code(response.text or "")
+    return _clean_code(response.choices[0].message.content or "")
 
 
 async def fix_build_error(code: str, error: str) -> str:
-    prompt = (
-        f"This App.tsx has a build error. Fix it and return the complete corrected file.\n\n"
-        f"ERROR:\n{error}\n\n"
-        f"CURRENT CODE:\n{code}"
+    response = await client.chat.complete_async(
+        model=MISTRAL_MODEL,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": (
+                    f"This App.tsx has a build error. Fix it and return the complete corrected file.\n\n"
+                    f"ERROR:\n{error}\n\nCURRENT CODE:\n{code}"
+                ),
+            },
+        ],
+        temperature=0.2,
+        max_tokens=8000,
     )
-    response = await client.aio.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt,
-        config=genai_types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            temperature=0.2,
-            max_output_tokens=8192,
-        ),
-    )
-    return _clean_code(response.text or "")
+    return _clean_code(response.choices[0].message.content or "")
 
 
 def _clean_code(code: str) -> str:
     code = code.strip()
-    # Strip markdown code fences if the model wraps the output
     if code.startswith("```"):
         lines = code.split("\n")
         if lines[-1].strip() == "```":

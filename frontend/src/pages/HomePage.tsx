@@ -171,7 +171,7 @@ export default function HomePage() {
               </div>
               <span>
                 {status === 'generating'
-                  ? 'Gemini is writing your app...'
+                  ? 'Codestral is writing your app...'
                   : 'Vite is building it...'}
               </span>
             </div>
