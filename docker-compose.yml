@@ -1,0 +1,20 @@
+services:
+  cocreate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - backend/.env
+    environment:
+      - APPS_DIR=/app/data/generated_apps
+      - DB_PATH=/app/data/cocreate.db
+      - FRONTEND_DIST=/app/frontend/dist
+    volumes:
+      # Persists generated apps and the SQLite database between restarts
+      - cocreate_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  cocreate_data:
