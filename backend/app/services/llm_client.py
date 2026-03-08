@@ -3,7 +3,7 @@ from app.config import MISTRAL_API_KEY, MISTRAL_MODEL
 
 client = Mistral(api_key=MISTRAL_API_KEY)
 
-SYSTEM_PROMPT = """You are an expert React developer. Your job is to generate complete, working React applications.
+SYSTEM_PROMPT = """You are an expert React developer. Your job is to generate complete, fully working React applications.
 
 RULES:
 - Output ONLY a single complete App.tsx file with no explanation, no markdown, no code fences.
@@ -19,6 +19,16 @@ RULES:
 - NEVER use external API calls or fetch. All data must be local.
 - NEVER import from '@/components' or any path alias. Only the allowed imports above.
 - Include a nice header with the app name and a clean layout.
+
+INTERACTIVITY RULES (critical — apps must be fully interactive):
+- ALL buttons, cards, inputs, and clickable elements MUST have working onClick/onChange handlers.
+- For games: implement the COMPLETE game logic — selection, valid move checking, win conditions, scoring.
+  - Card games: clicking a card must select it; clicking a valid destination must move it. Highlight selected cards.
+  - Board games: implement turn logic, valid move highlighting, win detection.
+  - Never generate a game with a non-functional UI — all interactions must work.
+- For trackers/lists: add, edit, delete, and complete actions must all be wired up.
+- For forms: validate inputs and show feedback.
+- State must update visibly when the user interacts — never leave onClick handlers empty or as stubs.
 """
 
 ITERATE_SYSTEM_PROMPT = """You are an expert React developer iterating on an existing app.
@@ -32,6 +42,7 @@ RULES:
 - Maintain localStorage persistence from the original.
 - Export the App component as default: export default function App() { ... }
 - NEVER import from '@/components' or any path alias.
+- Ensure ALL interactive elements remain fully functional after your changes.
 """
 
 
