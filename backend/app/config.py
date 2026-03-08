@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "")
-MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "codestral-latest")
+MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "mistral-large-latest")
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./cocreate.db")
 DB_PATH = os.getenv("DB_PATH", "./cocreate.db")
